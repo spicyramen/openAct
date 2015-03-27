@@ -1,12 +1,22 @@
 #!/bin/bash
 #
-# Program: Install MCU mixer in Ubuntu 12.04
+# Program: Install MCU mixer in Ubuntu 12.04+
 # Author: Gonzalo Gasca Meza <gonzalo@cloudtree.io>
 # This program is distributed under the terms of the GNU Public License V2
 
 trap "rm .f 2> /dev/null; exit" 0 1 3
 # Initialize our own variables:
+CERT_DURATION=1825
+CERT_COUNTRY="US"
+CERT_STATE="California"
+CERT_LOCATION="Milpitas"
+CERT_ORGANIZATION="Engineering"
 
+# This line is in Make file, we will replace it
+ORIG_CERT="@openssl req -nodes -new -x509 -keyout \$(BIN)/mcu.key -out \$(BIN)/mcu.crt"
+NEW_CERT="openssl req -nodes -days $CERT_DURATION -new -x509 -newkey rsa:2048 -keyout mcu.key -out mcu.crt -subj \"/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_LOCATION/O=$CERT_ORGANIZATION/CN=$HOSTNAME"
+
+# Check
 function check {
 	ERROR_CODE=$(echo "$?")
     	 if [ $ERROR_CODE -ne 0 ]; then
@@ -48,7 +58,8 @@ wget http://downloads.xiph.org/releases/opus/opus-1.0.2.tar.gz
 tar xvzf opus-1.0.2.tar.gz
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
 tar xvzf yasm-1.2.0.tar.gz
- 
+
+# Get latest version of code add checks 
 svn checkout svn://svn.code.sf.net/p/mcumediaserver/code/trunk medooze
 check;
 svn checkout http://mp4v2.googlecode.com/svn/trunk/ mp4v2
@@ -61,6 +72,7 @@ git clone http://git.chromium.org/webm/libvpx.git
 check;
 git clone https://github.com/cisco/libsrtp
 check;
+
 #
 # Compiling yasm 1.2
 #
@@ -173,19 +185,30 @@ ninja -C out/Release/ common_audio
 
 
 cd /usr/local/src/medooze/mcu
-
+# Change defaults options
 sed -i "s/^\(SANITIZE\s*=\s*\).*\$/\1no/" config.mk
 sed -i "s/^\(STATIC\s*=\s*\).*\$/\1no/" config.mk
 sed -i "s/^\(VADWEBRTC\s*=\s*\).*\$/\1no/" config.mk
 
+# Change Makefile certificates
+# Certificates for DTLS are generated like this: openssl req -nodes -new -x509 -keyout $(BIN)/mcu.key -out $(BIN)/mcu.crt
+# Prevent systems to ask for certificates
+sed "s|$ORIG_CERT|\ $NEW_CERT|" -i Makefile
+make
+
+
 ldconfig
+echo "Creating and starting services"
 cd /etc/init.d
 wget https://raw.githubusercontent.com/spicyramen/opencall/Development/config/mediamixer
 chmod 777 /etc/init.d/mediamixer
 update-rc.d mediamixer defaults
 /etc/init.d/mediamixer start
+check;
 
 echo "Cleaning up"
 cd /usr/local/src
 rm -rf *.tar.gz
 rm -rf *.tgz
+
+echo "Installation completed succesfully!"
