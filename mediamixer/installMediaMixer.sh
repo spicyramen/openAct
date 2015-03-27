@@ -7,6 +7,15 @@
 trap "rm .f 2> /dev/null; exit" 0 1 3
 # Initialize our own variables:
 
+function check {
+	ERROR_CODE=$(echo "$?")
+    	 if [ $ERROR_CODE -ne 0 ]; then
+	       	echo "Error ($ERROR_CODE) Fatal Exception occurred"
+	        exit 1
+    	 fi
+     	return 0
+}
+
 #Update system
 apt-get update
 apt-get update --fix-missing
@@ -41,12 +50,17 @@ wget http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
 tar xvzf yasm-1.2.0.tar.gz
  
 svn checkout svn://svn.code.sf.net/p/mcumediaserver/code/trunk medooze
+check;
 svn checkout http://mp4v2.googlecode.com/svn/trunk/ mp4v2
+check;
 git clone git://git.videolan.org/ffmpeg.git
+check;
 git clone git://git.videolan.org/x264.git
+check;
 git clone http://git.chromium.org/webm/libvpx.git
+check;
 git clone https://github.com/cisco/libsrtp
-
+check;
 #
 # Compiling yasm 1.2
 #
@@ -175,4 +189,3 @@ echo "Cleaning up"
 cd /usr/local/src
 rm -rf *.tar.gz
 rm -rf *.tgz
-
