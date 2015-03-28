@@ -14,7 +14,7 @@ CERT_ORGANIZATION="Engineering"
 
 # This line is in Make file, we will replace it
 ORIG_CERT="@openssl req -nodes -new -x509 -keyout \$(BIN)/mcu.key -out \$(BIN)/mcu.crt"
-NEW_CERT="@openssl req -nodes -days $CERT_DURATION -new -x509 -newkey rsa:2048 -keyout mcu.key -out mcu.crt -subj \"/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_LOCATION/O=$CERT_ORGANIZATION/CN=$HOSTNAME\""
+NEW_CERT="@openssl req -nodes -days $CERT_DURATION -new -x509 -keyout \$(BIN)/mcu.key -out \$(BIN)/mcu.crt -subj \"/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_LOCATION/O=$CERT_ORGANIZATION/CN=$HOSTNAME\""
 
 # Check
 function check {
