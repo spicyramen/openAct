@@ -13,7 +13,7 @@ MOBICENTS_FILE="mss-3.0.564-jboss-as-7.2.0.Final.zip"
 MOBICENTS_DIR="mss-3.0.564-jboss-as-7.2.0.Final"
 IP_ADDR=`ifconfig | awk -F':' '/inet addr/&&!/127.0.0.1/{split($2,_," ");print _[1]}'`
 
-MCUWEB_URL"http://sourceforge.net/projects/mcumediaserver/files/mcumediaserver/rev%201253/mcuWeb.sar/download"
+MCUWEB_URL="http://sourceforge.net/projects/mcumediaserver/files/mcumediaserver/rev%201253/mcuWeb.sar/download"
 
 #Update system
 apt-get install zip -y
