@@ -200,7 +200,7 @@ make
 ldconfig
 echo "Creating and starting services"
 cd /etc/init.d
-wget https://raw.githubusercontent.com/spicyramen/opencall/Development/config/mediamixer
+wget https://raw.githubusercontent.com/spicyramen/openAct/master/mediamixer/conf/mediamixer
 chmod 777 /etc/init.d/mediamixer
 update-rc.d mediamixer defaults
 /etc/init.d/mediamixer start
