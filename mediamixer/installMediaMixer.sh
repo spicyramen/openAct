@@ -11,7 +11,7 @@ CERT_COUNTRY="US"
 CERT_STATE="California"
 CERT_LOCATION="Milpitas"
 CERT_ORGANIZATION="Engineering"
-
+INSTALL_JAVA=0
 # This line is in Make file, we will replace it
 ORIG_CERT="@openssl req -nodes -new -x509 -keyout \$(BIN)/mcu.key -out \$(BIN)/mcu.crt"
 NEW_CERT="@openssl req -nodes -days $CERT_DURATION -new -x509 -keyout \$(BIN)/mcu.key -out \$(BIN)/mcu.crt -subj \"/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_LOCATION/O=$CERT_ORGANIZATION/CN=$HOSTNAME\""
@@ -102,16 +102,21 @@ make
 make install
 cd ..
 
-
-apt-get install openjdk-7-jdk -y
-update-alternatives --config javac
-update-alternatives --config java
-update-alternatives --config javaws
-update-alternatives --config javap
-update-alternatives --config jar
-update-alternatives --config jarsigner
-echo $JAVA_HOME
-export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+if [ $INSTALL_JAVA -eq 1 ]; then
+   	echo "Installing JAVA";
+   	apt-get install openjdk-7-jdk -y
+	update-alternatives --config javac
+	update-alternatives --config java
+	update-alternatives --config javaws
+	update-alternatives --config javap
+	update-alternatives --config jar
+	update-alternatives --config jarsigner
+	echo $JAVA_HOME
+	export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+else
+	echo "Verify Java is already installed"
+	java -version
+fi
 
 
 #
