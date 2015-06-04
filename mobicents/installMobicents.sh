@@ -13,7 +13,7 @@ MOBICENTS_FILE="mss-3.0.564-jboss-as-7.2.0.Final.zip"
 MOBICENTS_DIR="mss-3.0.564-jboss-as-7.2.0.Final"
 IP_ADDR=`ifconfig | awk -F':' '/inet addr/&&!/127.0.0.1/{split($2,_," ");print _[1]}'`
 
-MCUWEB_URL="https://github.com/spicyramen/openAct/blob/master/mcuWeb/mcuWeb.war"
+MCUWEB_URL="https://github.com/spicyramen/openAct/blob/master/mcuweb/mcuWeb.war"
 set -e
 #Update system
 apt-get install zip -y
@@ -43,8 +43,9 @@ wget $MCUWEB_URL
 sleep 2
 mv mcuWeb.war $MOBICENTS_DIR/standalone/deployments/
 
+cd $MOBICENTS_DIR/bin
+if ps | grep standalone.sh; then  ./jboss-cli.sh --connect command=:shutdown; else  echo 'No active instance'; fi
 echo "Kill any existing instance"
-./jboss-cli.sh --connect command=:shutdown
 
 echo "Start Mobicents"
 ./standalone.sh -b $IP_ADDR -c standalone-sip.xml &
